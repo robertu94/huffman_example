@@ -169,7 +169,7 @@ main()
   std::vector<uint8_t> encoded;
   for (auto v : values) {
     // fmt::println("s={} -> e={}", v, encoding[v]);
-    encoded.insert(encoded.end(), encoding.at(v).begin(), encoding.at(v).end());
+    encoded.insert(encoded.end(), encoding[v].begin(), encoding[v].end());
   }
   auto serial_end = std::chrono::steady_clock::now();
   fmt::println(
@@ -217,7 +217,7 @@ main()
     for (size_t i = 0; i < offsets.size(); ++i) {
       offsets[i] = acc;
       #pragma omp scan exclusive(acc)
-      acc += encoding.at(values[i]).size();
+      acc += encoding[values[i]].size();
     }
 
     // OpenMP has an implicit barrier here that is technically unneeded if we can guarantee that
@@ -229,7 +229,7 @@ main()
     //   we use nowait here to omit a duplicate synchronization call at the end of omp parallel and omp for
     #pragma omp for nowait
     for (size_t i = 0; i < offsets.size(); ++i) {
-      auto encoded = encoding.at(values[i]);
+      auto encoded = encoding[values[i]];
       for (size_t j = 0; j < encoded.size(); ++j) {
         par_encoded[j + offsets[i]] = encoded[j];
       }
